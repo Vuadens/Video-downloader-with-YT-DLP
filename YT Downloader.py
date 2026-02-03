@@ -10,6 +10,7 @@ DEFAULT_AUDIO_PATH = os.path.join(os.path.expanduser("~"), "Downloads", "YT-DLP"
 DEFAULT_VIDEO_PATH = os.path.join(os.path.expanduser("~"), "Downloads", "YT-DLP", "Video")
 DEFAULT_FFMPEG_PATH = ""
 DEFAULT_COOKIES_PATH = ""
+DEFAULT_BROWSER_COOKIES = "none"
 
 
 def check_yt_dlp():
@@ -36,7 +37,14 @@ def create_directories(audio_path, video_path):
     os.makedirs(video_path, exist_ok=True)
 
 
-def build_video_command(url, video_path, ffmpeg_path, player_client, cookies_path):
+def build_video_command(
+    url,
+    video_path,
+    ffmpeg_path,
+    player_client,
+    cookies_path,
+    browser_cookies,
+):
     if ffmpeg_path:
         format_selector = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
     else:
@@ -56,11 +64,20 @@ def build_video_command(url, video_path, ffmpeg_path, player_client, cookies_pat
         command.extend(["--extractor-args", f"youtube:player_client={player_client}"])
     if cookies_path:
         command.extend(["--cookies", cookies_path])
+    if browser_cookies and browser_cookies != "none":
+        command.extend(["--cookies-from-browser", browser_cookies])
     command.append(url)
     return command
 
 
-def build_audio_command(url, audio_path, ffmpeg_path, player_client, cookies_path):
+def build_audio_command(
+    url,
+    audio_path,
+    ffmpeg_path,
+    player_client,
+    cookies_path,
+    browser_cookies,
+):
     command = [
         "yt-dlp",
         "-f",
@@ -79,6 +96,8 @@ def build_audio_command(url, audio_path, ffmpeg_path, player_client, cookies_pat
         command.extend(["--extractor-args", f"youtube:player_client={player_client}"])
     if cookies_path:
         command.extend(["--cookies", cookies_path])
+    if browser_cookies and browser_cookies != "none":
+        command.extend(["--cookies-from-browser", browser_cookies])
     command.append(url)
     return command
 
@@ -95,7 +114,8 @@ class DownloaderGUI:
         self.ffmpeg_path_var = tk.StringVar(value=DEFAULT_FFMPEG_PATH)
         self.cookies_path_var = tk.StringVar(value=DEFAULT_COOKIES_PATH)
         self.status_var = tk.StringVar(value="Ready. Check yt-dlp status before downloading.")
-        self.player_client_var = tk.StringVar(value="default")
+        self.player_client_var = tk.StringVar(value="android")
+        self.browser_cookies_var = tk.StringVar(value=DEFAULT_BROWSER_COOKIES)
 
         self.log_queue = queue.Queue()
         self.worker_thread = None
@@ -144,6 +164,7 @@ class DownloaderGUI:
             is_directory=False,
         )
         self._add_client_row(form_frame)
+        self._add_browser_cookies_row(form_frame)
 
         button_frame = ttk.Frame(main_frame)
         button_frame.pack(fill="x", pady=(0, 12))
@@ -210,11 +231,26 @@ class DownloaderGUI:
         row = ttk.Frame(parent)
         row.pack(fill="x", pady=4)
         ttk.Label(row, text="YouTube player client:", width=24).pack(side="left")
-        client_options = ["default", "android", "web", "ios", "tv"]
+        client_options = ["android", "web", "ios", "tv", "default"]
         combo = ttk.Combobox(
             row,
             textvariable=self.player_client_var,
             values=client_options,
+            state="readonly",
+        )
+        combo.pack(side="left", fill="x", expand=True)
+        combo.current(0)
+        return combo
+
+    def _add_browser_cookies_row(self, parent):
+        row = ttk.Frame(parent)
+        row.pack(fill="x", pady=4)
+        ttk.Label(row, text="Use browser cookies:", width=24).pack(side="left")
+        options = ["none", "chrome", "edge", "firefox", "brave", "opera"]
+        combo = ttk.Combobox(
+            row,
+            textvariable=self.browser_cookies_var,
+            values=options,
             state="readonly",
         )
         combo.pack(side="left", fill="x", expand=True)
@@ -289,6 +325,7 @@ class DownloaderGUI:
         ffmpeg_path = self.ffmpeg_path_var.get().strip()
         cookies_path = self.cookies_path_var.get().strip()
         player_client = self.player_client_var.get().strip()
+        browser_cookies = self.browser_cookies_var.get().strip()
         create_directories(audio_path, video_path)
 
         if mode == "video":
@@ -298,6 +335,7 @@ class DownloaderGUI:
                 ffmpeg_path,
                 player_client,
                 cookies_path,
+                browser_cookies,
             )
             action = "Downloading video"
         else:
@@ -313,6 +351,7 @@ class DownloaderGUI:
                 ffmpeg_path,
                 player_client,
                 cookies_path,
+                browser_cookies,
             )
             action = "Downloading audio"
 
