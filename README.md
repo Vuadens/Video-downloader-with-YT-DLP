@@ -22,7 +22,7 @@ python "YT Downloader.py"
 3. Paste a YouTube URL.
 4. Choose download folders (optional) and set FFmpeg if you want MP3 audio.
 5. Optionally choose a cookies file or browser cookies (Chrome/Edge/Firefox) and a YouTube player client.
-6. Leave **Prefer single-file MP4** enabled to avoid DASH fragments (helps reduce 403 errors).
+6. **Prefer single-file MP4** is lower quality. Disable it and set FFmpeg for original quality.
 7. Click **Download Video** or **Download Audio**.
 
 If `yt-dlp` is not installed, click **Check/Install yt-dlp** in the GUI to install it automatically.

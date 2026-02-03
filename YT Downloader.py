@@ -11,7 +11,7 @@ DEFAULT_VIDEO_PATH = os.path.join(os.path.expanduser("~"), "Downloads", "YT-DLP"
 DEFAULT_FFMPEG_PATH = ""
 DEFAULT_COOKIES_PATH = ""
 DEFAULT_BROWSER_COOKIES = "none"
-DEFAULT_PREFER_PROGRESSIVE = True
+DEFAULT_PREFER_PROGRESSIVE = False
 
 
 def check_yt_dlp():
@@ -270,7 +270,7 @@ class DownloaderGUI:
         ttk.Checkbutton(
             row,
             variable=self.prefer_progressive_var,
-            text="Avoid DASH fragments (fewer 403 errors)",
+            text="Lower quality but fewer fragment errors",
         ).pack(side="left")
         return row
 
@@ -347,6 +347,12 @@ class DownloaderGUI:
         create_directories(audio_path, video_path)
 
         if mode == "video":
+            if prefer_progressive is False and not ffmpeg_path:
+                messagebox.showwarning(
+                    "FFmpeg required",
+                    "Best quality video needs FFmpeg. Set FFmpeg or enable Prefer single-file MP4.",
+                )
+                return
             command = build_video_command(
                 url,
                 video_path,
