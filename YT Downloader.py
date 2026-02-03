@@ -11,6 +11,7 @@ DEFAULT_VIDEO_PATH = os.path.join(os.path.expanduser("~"), "Downloads", "YT-DLP"
 DEFAULT_FFMPEG_PATH = ""
 DEFAULT_COOKIES_PATH = ""
 DEFAULT_BROWSER_COOKIES = "none"
+DEFAULT_PREFER_PROGRESSIVE = True
 
 
 def check_yt_dlp():
@@ -44,8 +45,11 @@ def build_video_command(
     player_client,
     cookies_path,
     browser_cookies,
+    prefer_progressive,
 ):
-    if ffmpeg_path:
+    if prefer_progressive:
+        format_selector = "best[ext=mp4]/best"
+    elif ffmpeg_path:
         format_selector = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
     else:
         format_selector = "best[ext=mp4]/best"
@@ -116,6 +120,7 @@ class DownloaderGUI:
         self.status_var = tk.StringVar(value="Ready. Check yt-dlp status before downloading.")
         self.player_client_var = tk.StringVar(value="android")
         self.browser_cookies_var = tk.StringVar(value=DEFAULT_BROWSER_COOKIES)
+        self.prefer_progressive_var = tk.BooleanVar(value=DEFAULT_PREFER_PROGRESSIVE)
 
         self.log_queue = queue.Queue()
         self.worker_thread = None
@@ -165,6 +170,7 @@ class DownloaderGUI:
         )
         self._add_client_row(form_frame)
         self._add_browser_cookies_row(form_frame)
+        self._add_progressive_row(form_frame)
 
         button_frame = ttk.Frame(main_frame)
         button_frame.pack(fill="x", pady=(0, 12))
@@ -257,6 +263,17 @@ class DownloaderGUI:
         combo.current(0)
         return combo
 
+    def _add_progressive_row(self, parent):
+        row = ttk.Frame(parent)
+        row.pack(fill="x", pady=4)
+        ttk.Label(row, text="Prefer single-file MP4:", width=24).pack(side="left")
+        ttk.Checkbutton(
+            row,
+            variable=self.prefer_progressive_var,
+            text="Avoid DASH fragments (fewer 403 errors)",
+        ).pack(side="left")
+        return row
+
     def _browse_path(self, variable, is_directory):
         if is_directory:
             selected = filedialog.askdirectory()
@@ -326,6 +343,7 @@ class DownloaderGUI:
         cookies_path = self.cookies_path_var.get().strip()
         player_client = self.player_client_var.get().strip()
         browser_cookies = self.browser_cookies_var.get().strip()
+        prefer_progressive = self.prefer_progressive_var.get()
         create_directories(audio_path, video_path)
 
         if mode == "video":
@@ -336,6 +354,7 @@ class DownloaderGUI:
                 player_client,
                 cookies_path,
                 browser_cookies,
+                prefer_progressive,
             )
             action = "Downloading video"
         else:
