@@ -50,7 +50,7 @@ def build_video_command(
     if prefer_progressive:
         format_selector = "best[ext=mp4]/best"
     elif ffmpeg_path:
-        format_selector = "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
+        format_selector = "bestvideo+bestaudio/best"
     else:
         format_selector = "best[ext=mp4]/best"
 
@@ -62,7 +62,7 @@ def build_video_command(
         os.path.join(video_path, "%(title)s.%(ext)s"),
     ]
     if ffmpeg_path:
-        command.extend(["--merge-output-format", "mp4", "--recode-video", "mp4"])
+        command.extend(["--merge-output-format", "mp4"])
         command.extend(["--ffmpeg-location", ffmpeg_path])
     if player_client:
         command.extend(["--extractor-args", f"youtube:player_client={player_client}"])
