@@ -4,8 +4,8 @@ import sys
 
 # Configuration
 FFMPEG_PATH = r"C:\ffmpeg\bin"
-AUDIO_PATH = r"G:\Formateo Ryzen 7\Programacion\yt-dlp\Descargas\Audio"
-VIDEO_PATH = r"G:\Formateo Ryzen 7\Programacion\yt-dlp\Descargas\Video"
+AUDIO_PATH = r"G:\Formateo Ryzen 7\Descargas yt-dlp\Audio"
+VIDEO_PATH = r"G:\Formateo Ryzen 7\Descargas yt-dlp\Video"
 
 def cls():
     os.system("cls")

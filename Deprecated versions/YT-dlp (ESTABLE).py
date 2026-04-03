@@ -44,7 +44,7 @@ def descargar_video(url):
         ydl_opts = {
             "format": formato,
             "outtmpl": f"{VIDEO_DOWNLOAD_DIR}/%(title)s.%(ext)s",
-            "ffmpeg_location": r"C:\ffmpeg",
+            "ffmpeg_location": r"C:\ffmpeg\bin",
             "quiet": True,
             "progress_hooks": [progreso_descarga],
             "merge_output_format": "mp4",
@@ -71,7 +71,7 @@ def descargar_audio(url):
         ydl_opts = {
             "format": "bestaudio/best",
             "outtmpl": f"{AUDIO_DOWNLOAD_DIR}/%(title)s.%(ext)s",
-            "ffmpeg_location": r"C:\ffmpeg",  # Ruta explícita donde esta instalado el FFmpeg en la pc
+            "ffmpeg_location": r"C:\ffmpeg\bin",  # Ruta explícita donde esta instalado el FFmpeg en la pc
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
